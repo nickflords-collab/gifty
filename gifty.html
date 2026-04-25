@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>A Surprise for You 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;background:#fff5f8;display:flex;align-items:center;justify-content:center;overflow-x:hidden;font-family:'Lato',sans-serif}
+  .scene{width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;position:relative;overflow:hidden}
+  .petal{position:absolute;border-radius:50% 0 50% 0;opacity:.12;animation:floatUp linear infinite;pointer-events:none}
+  @keyframes floatUp{0%{transform:translateY(0) rotate(0deg);opacity:0}10%{opacity:.15}90%{opacity:.1}100%{transform:translateY(-120vh) rotate(360deg);opacity:0}}
+  .card{width:100%;max-width:480px;border-radius:28px;background:linear-gradient(150deg,#fffbfc,#fff0f5);border:1px solid rgba(220,80,120,.15);box-shadow:0 24px 70px rgba(200,50,100,.13),0 4px 18px rgba(0,0,0,.06);padding:2.8rem 2.2rem 2.2rem;text-align:center;position:relative;overflow:hidden;animation:cardIn .8s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes cardIn{from{opacity:0;transform:scale(.88) translateY(32px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .card::before{content:'';position:absolute;top:-70px;right:-70px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,150,180,.18) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+  .heart-big{font-size:56px;display:block;margin-bottom:.5rem;animation:heartbeat 1.5s ease-in-out infinite}
+  @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.18)}28%{transform:scale(1)}42%{transform:scale(1.12)}56%{transform:scale(1)}}
+  .label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(200,50,100,.55);margin-bottom:.4rem}
+  .to-line{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(180,50,100,.45);margin-bottom:.3rem}
+  input.name-in{background:transparent;border:none;border-bottom:1px dashed rgba(200,80,130,.35);outline:none;font-family:'Playfair Display',serif;font-size:1.1rem;color:#a02848;text-align:center;width:200px;padding:3px 4px;margin-bottom:1.4rem}
+  input.name-in::placeholder{color:rgba(180,80,130,.3)}
+  .title{font-family:'Playfair Display',serif;font-style:italic;font-size:2rem;color:#c0325a;line-height:1.2;margin-bottom:.4rem}
+  .subtitle{font-family:'Playfair Display',serif;font-size:1rem;color:rgba(180,50,90,.6);margin-bottom:1.5rem;letter-spacing:.5px}
+  .divider{width:60px;height:1px;background:linear-gradient(to right,transparent,rgba(200,50,100,.4),transparent);margin:0 auto 1.5rem}
+  .field-group{margin-bottom:1rem;text-align:left}
+  .field-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(180,50,100,.5);margin-bottom:.35rem;display:block}
+  input.field-in{background:rgba(255,245,250,.8);border:1px solid rgba(200,80,130,.2);border-radius:10px;outline:none;font-family:'Lato',sans-serif;font-size:.95rem;color:#7a2040;padding:10px 14px;width:100%;transition:border-color .2s}
+  input.field-in:focus{border-color:rgba(200,80,130,.5)}
+  input.field-in::placeholder{color:rgba(180,80,130,.3)}
+  .message-box{background:rgba(255,240,248,.8);border:1px solid rgba(220,80,130,.12);border-radius:16px;padding:1.2rem;margin-bottom:1.4rem;margin-top:.8rem}
+  .message-box textarea{width:100%;background:transparent;border:none;outline:none;resize:none;font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:#7a2040;line-height:1.8;min-height:90px;text-align:center}
+  .message-box textarea::placeholder{color:rgba(180,80,120,.35)}
+  .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn{font-family:'Lato',sans-serif;font-size:13px;letter-spacing:1px;padding:10px 22px;border-radius:30px;border:1px solid rgba(200,60,110,.35);cursor:pointer;transition:all .2s;color:#c0325a;background:white}
+  .btn:hover{background:rgba(255,220,235,.7);transform:translateY(-1px)}
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:linear-gradient(135deg,#e84479,#c0325a);color:white;border-color:transparent;box-shadow:0 4px 14px rgba(200,50,90,.3);min-width:170px}
+  .btn-primary:hover{background:linear-gradient(135deg,#f05080,#d03a68)}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+  .sent-msg{display:none;font-family:'Playfair Display',serif;font-style:italic;font-size:1.1rem;color:#c0325a;padding:1rem;animation:fadeIn .6s ease;line-height:1.8}
+  .error-msg{display:none;font-family:'Lato',sans-serif;font-size:.85rem;color:#b02040;background:rgba(255,220,230,.5);border:1px solid rgba(220,80,120,.2);border-radius:10px;padding:.7rem 1rem;margin-bottom:1rem;text-align:left;line-height:1.5}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .spark{position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(230,100,150,.5);animation:sparkle 2s ease-in-out infinite}
+  @keyframes sparkle{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
+  .confetti-wrap{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;display:none}
+  .confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall 2.5s ease-in forwards}
+  @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(600px) rotate(720deg);opacity:0}}
+  .spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="confetti-wrap" id="confetti"></div>
+
+<div class="scene" id="scene">
+  <div class="card">
+    <div id="sparkles" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;border-radius:28px"></div>
+
+    <span class="heart-big">🌹</span>
+    <p class="label">a little surprise for</p>
+    <p class="to-line">to</p>
+    <div style="margin-bottom:1.2rem">
+      <input class="name-in" id="nameInput" placeholder="her name" maxlength="24"/>
+    </div>
+
+    <p class="title">You mean<br>everything to me</p>
+    <p class="subtitle">— and so much more</p>
+    <div class="divider"></div>
+
+    <div class="field-group">
+      <label class="field-label">her email address</label>
+      <input class="field-in" type="email" id="toEmail" placeholder="her@email.com"/>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">your name</label>
+      <input class="field-in" type="text" id="fromName" placeholder="e.g. John" maxlength="40"/>
+    </div>
+
+    <div class="message-box">
+      <textarea id="msgArea" rows="4" placeholder="Write your message here…&#10;(e.g. Every day with you feels like a dream.)"></textarea>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="actions" id="actionBtns">
+      <button class="btn" onclick="addEmoji()">add a heart ♡</button>
+      <button class="btn btn-primary" id="sendBtn" onclick="sendSurprise()">send the surprise →</button>
+    </div>
+
+    <div class="sent-msg" id="sentMsg"></div>
+  </div>
+</div>
+
+<script>
+  emailjs.init({ publicKey: 'HcUY8L0iZVvyuHm-N' });
+
+  // Sparkles
+  const sp=document.getElementById('sparkles');
+  for(let i=0;i<10;i++){const s=document.createElement('div');s.className='spark';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=(Math.random()*2)+'s';s.style.animationDuration=(1.5+Math.random())+'s';sp.appendChild(s);}
+
+  // Floating petals
+  const sc=document.getElementById('scene');
+  const pc=['#e84479','#f08080','#ffb6c1','#f4a0c8','#ff6b9d','#ffc0d0'];
+  for(let i=0;i<14;i++){const p=document.createElement('div');p.className='petal';const sz=10+Math.random()*20;p.style.cssText=`width:${sz}px;height:${sz}px;background:${pc[Math.floor(Math.random()*pc.length)]};left:${Math.random()*100}%;bottom:-30px;animation-delay:${Math.random()*8}s;animation-duration:${6+Math.random()*6}s;`;sc.appendChild(p);}
+
+  function addEmoji(){
+    const hearts=['♥','💕','🌸','✨','🌹','💖','🦋','💝'];
+    const a=document.getElementById('msgArea');
+    a.value+=(a.value?' ':'')+hearts[Math.floor(Math.random()*hearts.length)];
+    a.focus();
+  }
+
+  function showError(msg){const el=document.getElementById('errorMsg');el.textContent=msg;el.style.display='block';}
+  function hideError(){document.getElementById('errorMsg').style.display='none';}
+
+  async function sendSurprise(){
+    hideError();
+    const name     = document.getElementById('nameInput').value.trim() || 'my love';
+    const toEmail  = document.getElementById('toEmail').value.trim();
+    const fromName = document.getElementById('fromName').value.trim();
+    const msg      = document.getElementById('msgArea').value.trim();
+
+    if(!toEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) return showError('Please enter her email address. 💌');
+    if(!fromName) return showError("Please enter your name so she knows it's from you! 🥰");
+    if(!msg) return showError('Please write a message for her first… 💌');
+
+    const btn=document.getElementById('sendBtn');
+    btn.disabled=true;
+    btn.innerHTML='<span class="spinner"></span>sending…';
+
+    try{
+      await emailjs.send('service_s8p8hln', 'template_geg2a1a', {
+        to_name:   name,
+        to_email:  toEmail,
+        from_name: fromName,
+        message:   msg,
+      });
+
+      launchConfetti();
+      document.getElementById('actionBtns').style.display='none';
+      const el=document.getElementById('sentMsg');
+      el.innerHTML=`🎉 Surprise sent to <em>${name}</em>!<br><br>She'll open her inbox and smile. 🌷<br><br>You're such a sweet boyfriend. 💕`;
+      el.style.display='block';
+
+    }catch(err){
+      btn.disabled=false;
+      btn.innerHTML='send the surprise →';
+      showError('Send failed: '+(err.text||err.message||JSON.stringify(err)));
+    }
+  }
+
+  function launchConfetti(){
+    const w=document.getElementById('confetti');w.style.display='block';
+    const cc=['#e84479','#f4a0c8','#ffe0ec','#ff6b9d','#ffc0d0','#c0325a','#ffb6c1'];
+    for(let i=0;i<70;i++){const c=document.createElement('div');c.className='confetti-piece';c.style.cssText=`left:${Math.random()*100}%;top:-10px;background:${cc[Math.floor(Math.random()*cc.length)]};animation-delay:${Math.random()*.8}s;animation-duration:${1.8+Math.random()*1.2}s;transform:rotate(${Math.random()*360}deg);border-radius:${Math.random()>.5?'50%':'2px'};`;w.appendChild(c);}
+    setTimeout(()=>{w.style.display='none';w.innerHTML='';},3500);
+  }
+</script>
+</body>
+</html>
